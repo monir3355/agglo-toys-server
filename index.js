@@ -28,9 +28,11 @@ async function run() {
     // await client.connect();
 
     const toyCollection = client.db("aggloToys").collection("toys");
+
     app.post("/toys", async (req, res) => {
       const toy = req.body;
-      console.log(toy);
+      const result = await toyCollection.insertOne(toy);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
