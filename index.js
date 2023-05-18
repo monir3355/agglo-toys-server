@@ -41,6 +41,13 @@ async function run() {
       const result = await toyCollection.findOne(query);
       res.send(result);
     });
+    // get all toys by email
+    app.get("/myToys/:email", async (req, res) => {
+      const result = await toyCollection
+        .find({ seller_email: req.params.email })
+        .toArray();
+      res.send(result);
+    });
 
     // post toys
     app.post("/toys", async (req, res) => {
