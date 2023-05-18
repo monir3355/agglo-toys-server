@@ -29,6 +29,13 @@ async function run() {
 
     const toyCollection = client.db("aggloToys").collection("toys");
 
+    // get all toys
+    app.get("/toys", async (req, res) => {
+      const result = await toyCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    // post toys
     app.post("/toys", async (req, res) => {
       const toy = req.body;
       const result = await toyCollection.insertOne(toy);
