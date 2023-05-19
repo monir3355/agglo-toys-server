@@ -49,6 +49,25 @@ async function run() {
       res.send(result);
     });
 
+    // get all toys by sub category
+    app.get("/categoryToys/:subCategory", async (req, res) => {
+      const result = await toyCollection
+        .find({ sub_category: req.params.subCategory })
+        .toArray();
+      res.send(result);
+    });
+
+    // search by toy name
+    app.get("/searchToys/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await toyCollection
+        .find({
+          toy_name: { $regex: text, $options: "i" },
+        })
+        .toArray();
+      res.send(result);
+    });
+
     // post toys
     app.post("/toys", async (req, res) => {
       const toy = req.body;
