@@ -68,12 +68,53 @@ async function run() {
       res.send(result);
     });
 
+    // sort by price
+    app.get("/toysSortByPrice/:email", async (req, res) => {
+      const email = req.params.email;
+
+      try {
+        // Sorting in ascending order based on price
+        const sortAscending = { price: 1 };
+
+        // Sorting in descending order based on price
+        const sortDescending = { price: -1 };
+
+        // Retrieve toys matching the seller's email
+        const result = await toyCollection
+          .find({ seller_email: email })
+          .toArray();
+
+        // Send the unsorted result by default
+        let sortedResult = result;
+
+        // Check if sorting order is specified in the query parameter
+        const sortOrder = req.query.sortOrder;
+        if (sortOrder === "asc") {
+          sortedResult = await toyCollection
+            .find({ seller_email: email })
+            .sort(sortAscending)
+            .toArray();
+        } else if (sortOrder === "desc") {
+          sortedResult = await toyCollection
+            .find({ seller_email: email })
+            .sort(sortDescending)
+            .toArray();
+        }
+
+        res.send(sortedResult);
+      } catch (error) {
+        console.error("Failed to fetch toys:", error);
+        res.status(500).send("An error occurred while fetching toys.");
+      }
+    });
+
     // post toys
     app.post("/toys", async (req, res) => {
       const toy = req.body;
       const result = await toyCollection.insertOne(toy);
       res.send(result);
     });
+
     // Update toy
     app.put("/toys/:id", async (req, res) => {
       const id = req.params.id;
