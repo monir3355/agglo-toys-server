@@ -73,16 +73,21 @@ async function run() {
       const email = req.params.email;
 
       try {
+        // Retrieve toys matching the seller's email
+        const result = await toyCollection
+          .find({ seller_email: email })
+          .toArray();
+
+        // Convert price values from string to number for sorting
+        result.forEach((toy) => {
+          toy.price = parseFloat(toy.price);
+        });
+
         // Sorting in ascending order based on price
         const sortAscending = { price: 1 };
 
         // Sorting in descending order based on price
         const sortDescending = { price: -1 };
-
-        // Retrieve toys matching the seller's email
-        const result = await toyCollection
-          .find({ seller_email: email })
-          .toArray();
 
         // Send the unsorted result by default
         let sortedResult = result;
@@ -90,15 +95,9 @@ async function run() {
         // Check if sorting order is specified in the query parameter
         const sortOrder = req.query.sortOrder;
         if (sortOrder === "asc") {
-          sortedResult = await toyCollection
-            .find({ seller_email: email })
-            .sort(sortAscending)
-            .toArray();
+          sortedResult.sort((a, b) => a.price - b.price);
         } else if (sortOrder === "desc") {
-          sortedResult = await toyCollection
-            .find({ seller_email: email })
-            .sort(sortDescending)
-            .toArray();
+          sortedResult.sort((a, b) => b.price - a.price);
         }
 
         res.send(sortedResult);
